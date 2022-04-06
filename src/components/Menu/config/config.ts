@@ -121,7 +121,7 @@ const config: (t: ContextApi['t']) => MenuEntry[] = (t) => {
       },
       {
         label: t('Referrals'),
-        icon: 'RefferalIcon',
+        icon: 'ReferralIcon',
         href: `/refferals`,
       },
       {
