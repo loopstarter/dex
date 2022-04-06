@@ -120,6 +120,11 @@ const config: (t: ContextApi['t']) => MenuEntry[] = (t) => {
         ],
       },
       {
+        label: t('Referrals'),
+        icon: 'RefferalIcon',
+        href: `/refferals`,
+      },
+      {
         label: t('Claim BNB'),
         icon: 'NftIcon',
         href: 'https://testnet.binance.org/faucet-smart',
