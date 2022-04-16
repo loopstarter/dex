@@ -104,10 +104,26 @@ const App: React.FC = () => {
   }, [])
 
   useEffect(() => {
-    if (mounted) {
-      setOldAccount(account)
+    async function getData() {
+      if (mounted) {
+        setOldAccount(account)
+        const isRegister = localStorage.getItem('isRegister')
+        if (isRegister === 'true') {
+          localStorage.removeItem('isRegister')
+          const signature = await signMessage(library, account, `${SIGN_MGS} 0`)
+          if (signature) {
+            registerUser(account, signature)
+            const savedCode = localStorage.getItem('code')
+            if (savedCode) {
+              addReferral(savedCode, account)
+              localStorage.removeItem('code')
+            }
+          }
+        }
+      }
     }
-  }, [account, mounted])
+    getData()
+  }, [account, addReferral, library, mounted, registerUser])
 
   useEffect(() => {
     async function getData() {
@@ -115,19 +131,14 @@ const App: React.FC = () => {
         if (account && mounted && oldAccount !== '' && account !== oldAccount) {
           const user = await getUser(account)
           if (!user) {
-            const signature = await signMessage(library, account, `${SIGN_MGS} 0`)
-            if (signature) {
-              registerUser(account, signature)
-              const savedCode = localStorage.getItem('code')
-              if (savedCode) {
-                addReferral(savedCode, account)
-                localStorage.removeItem('code')
-              }
-            }
+            localStorage.setItem('isRegister', 'true')
+            window.location.reload()
           }
         }
         // eslint-disable-next-line no-empty
-      } catch (error) {}
+      } catch (error) {
+        console.log(error)
+      }
     }
     getData()
   }, [account, addReferral, getUser, library, mounted, oldAccount, registerUser])
