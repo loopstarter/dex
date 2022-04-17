@@ -7,6 +7,7 @@ import { BIG_ZERO } from 'utils/bigNumber'
 import getGasPrice from 'utils/getGasPrice'
 import { useMasterchef, useSousChef } from 'hooks/useContract'
 import { DEFAULT_GAS_LIMIT } from 'config'
+import { formatBigNumber } from 'utils/formatBalance'
 
 const options = {
   gasLimit: DEFAULT_GAS_LIMIT,
@@ -16,6 +17,7 @@ const harvestPool = async (sousChefContract) => {
   const gasPrice = getGasPrice()
   const tx = await sousChefContract.deposit('0', { ...options, gasPrice })
   const receipt = await tx.wait()
+  console.log(receipt, formatBigNumber(receipt.cumulativeGasUsed), formatBigNumber(receipt.gasUsed))
   return receipt.status
 }
 
@@ -23,6 +25,7 @@ const harvestPoolBnb = async (sousChefContract) => {
   const gasPrice = getGasPrice()
   const tx = await sousChefContract.deposit({ ...options, value: BIG_ZERO, gasPrice })
   const receipt = await tx.wait()
+  console.log(receipt)
   return receipt.status
 }
 

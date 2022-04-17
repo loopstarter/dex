@@ -71,6 +71,7 @@ export default function Updater(): null {
               )
 
               const toast = receipt.status === 1 ? toastSuccess : toastError
+              console.log('transactions', transactions[hash])
               toast(
                 t('Transaction receipt'),
                 <Flex flexDirection="column">

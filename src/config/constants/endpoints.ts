@@ -7,7 +7,7 @@ export const API_PROFILE = process.env.REACT_APP_API_PROFILE
 export const API_NFT = process.env.REACT_APP_API_NFT
 export const SNAPSHOT_API = `${SNAPSHOT_BASE_URL}/graphql`
 export const SNAPSHOT_HUB_API = `${SNAPSHOT_BASE_URL}/api/message`
-export const BACKEND_URL = process.env.REACT_DEX_BACKEND_URL || 'https://testnet-api.loopstarter.com'
+export const BACKEND_URL = process.env.REACT_APP_DEX_BACKEND_URL || 'http://localhost:1112'
 export const SIGN_MGS = process.env.SIGN_MGS || 'loop-'
 
 /**
