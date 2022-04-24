@@ -7,6 +7,7 @@ import getNodeUrl from './getRpcUrl'
 
 const POLLING_INTERVAL = 12000
 const rpcUrl = getNodeUrl()
+console.log(rpcUrl)
 const chainId = parseInt(process.env.REACT_APP_CHAIN_ID, 10)
 
 const injected = new InjectedConnector({ supportedChainIds: [chainId] })
@@ -51,5 +52,6 @@ export const signMessage = async (provider: any, account: string, message: strin
     return signature
   }
 
+  console.log('in sign')
   return provider.getSigner(account).signMessage(message)
 }

@@ -120,16 +120,21 @@ const config: (t: ContextApi['t']) => MenuEntry[] = (t) => {
         ],
       },
       {
+        label: t('Referrals'),
+        icon: 'ReferralIcon',
+        href: `/refferals`,
+      },
+      {
         label: t('Claim BNB'),
         icon: 'NftIcon',
-        href: `https://testnet.binance.org/faucet-smart`,
+        href: 'https://testnet.binance.org/faucet-smart',
         target: '_blank',
       },
       {
         label: t('Changelly'),
         icon: 'TradeIcon',
         href: `/changelly`,
-        target: '_blank',
+        // target: '_blank',
       },
     ]
   }

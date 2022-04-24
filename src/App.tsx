@@ -5,11 +5,15 @@ import { DatePickerPortal } from 'components/DatePicker'
 import useEagerConnect from 'hooks/useEagerConnect'
 import useScrollOnRouteChange from 'hooks/useScrollOnRouteChange'
 import useUserAgent from 'hooks/useUserAgent'
-import React, { lazy } from 'react'
+import React, { lazy, useEffect, useState } from 'react'
 import { Route, Router, Switch, Redirect } from 'react-router-dom'
 import { usePollBlockNumber } from 'state/block/hooks'
 import { usePollCoreFarmData } from 'state/farms/hooks'
 import { useFetchProfile } from 'state/profile/hooks'
+import useWeb3Provider from 'hooks/useActiveWeb3React'
+import { signMessage } from 'utils/web3React'
+import { SIGN_MGS } from 'config/constants/endpoints'
+import useReferrals from 'hooks/useReferrals'
 import EasterEgg from './components/EasterEgg'
 import GlobalCheckClaimStatus from './components/GlobalCheckClaimStatus'
 import PageLoader from './components/Loader/PageLoader'
@@ -24,6 +28,7 @@ import DetailSpecialPool from './views/DetailSpecialPool'
 import Pools from './views/Pools'
 import Farms from './views/DefiFarms'
 import SpecialPools from './views/SpecialPools'
+import Referrals from './views/Referrals'
 import CommingSoon from './views/CommingSoon'
 import { RedirectPathToSwapOnly, RedirectToSwap, RedirectToSwapWithPairs } from './views/Swap/redirects'
 import {
@@ -67,6 +72,7 @@ BigNumber.config({
 
 const App: React.FC = () => {
   const { account } = useWeb3React()
+  const { library } = useWeb3Provider()
 
   usePollBlockNumber()
   useEagerConnect()
@@ -75,6 +81,77 @@ const App: React.FC = () => {
   useScrollOnRouteChange()
   useUserAgent()
   useInactiveListener()
+
+  useEffect(() => {
+    async function getData() {
+      const code = new URLSearchParams(window.location.search).get('code')
+      const savedCode = localStorage.getItem('code')
+      if (code && code !== account && !savedCode) {
+        localStorage.setItem('code', code)
+      }
+    }
+    getData()
+  }, [account])
+
+  const [mounted, setMounted] = useState<boolean>(false)
+  const [oldAccount, setOldAccount] = useState<string>('')
+  const { registerUser, getUser, addReferral } = useReferrals()
+
+  useEffect(() => {
+    setTimeout(() => {
+      setMounted(true)
+    }, 1000)
+  }, [])
+
+  useEffect(() => {
+    async function getData() {
+      if (mounted) {
+        setOldAccount(account)
+        const isRegister = localStorage.getItem('isRegister')
+        if (isRegister === 'true') {
+          localStorage.removeItem('isRegister')
+          const signature = await signMessage(library, account, `${SIGN_MGS} 0`)
+          if (signature) {
+            registerUser(account, signature)
+            const savedCode = localStorage.getItem('code')
+            if (savedCode) {
+              addReferral(savedCode, account)
+              localStorage.removeItem('code')
+            }
+          }
+        }
+      }
+    }
+    getData()
+  }, [account, addReferral, library, mounted, registerUser])
+
+  useEffect(() => {
+    async function getData() {
+      try {
+        if (account && mounted && oldAccount !== '' && account !== oldAccount) {
+          const user = await getUser(account)
+          if (!user) {
+            localStorage.setItem('isRegister', 'true')
+            window.location.reload()
+          }
+        }
+        // eslint-disable-next-line no-empty
+      } catch (error) {
+        console.log(error)
+      }
+    }
+    getData()
+  }, [account, addReferral, getUser, library, mounted, oldAccount, registerUser])
+
+  // useEffect(() => {
+  //   async function getData() {
+  //     const registeringAccount = localStorage.getItem('registeringAccount')
+  //     if (registeringAccount) {
+  //       localStorage.removeItem('registeringAccount')
+  //     }
+  //   }
+  //   getData()
+  // }, [])
 
   return (
     <Router history={history}>
@@ -109,6 +186,9 @@ const App: React.FC = () => {
             </Route>
             <Route path="/spool" exact>
               <SpecialPools />
+            </Route>
+            <Route path="/refferals" exact>
+              <Referrals />
             </Route>
             <Route exact strict path="/liquidity" component={Liquidity} />
             <Route exact strict path="/create" component={RedirectToAddLiquidity} />
