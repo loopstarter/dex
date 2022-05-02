@@ -206,6 +206,9 @@ export const usePriceCakeBusd = (): BigNumber => {
     return new BigNumber(cakePriceBusdAsString)
   }, [cakePriceBusdAsString])
 
-  // return new BigNumber(0.2)
-  return cakePriceBusd
+  let finalPrice = new BigNumber(0.055)
+  if (process.env.REACT_APP_CHAIN_ID === '97') {
+    finalPrice = cakePriceBusd
+  }
+  return finalPrice
 }
